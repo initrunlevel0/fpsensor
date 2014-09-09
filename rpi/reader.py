@@ -18,6 +18,8 @@ s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 s.bind((host, port))
 
 dataInside = {}
+dataInside['temperature'] = 0
+dataInside['humidity'] = 0
 def readFromOutside():
     while True:
         try:
@@ -41,14 +43,18 @@ def readInside():
             # Read DHT11 on pin 4, HARDCODED
             humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
             if(humidity is not None and temperature is not None):
+                oldTemperature = dataInside['temperature']
+		oldHumidity = dataInside['humidity']
+
                 # Create a dictionary data to send to socket
                 dataInside['temperature'] = temperature
                 dataInside['humidity'] = humidity
                 dataInside['source'] = "raspi"
-                print "Set dataInside, " + str(dataInside)
 
                 # Send to socket
-                s.sendto(json.dumps(dataInside), (host, port))
+		if oldHumidity != dataInside['humidity'] or oldTemperature != dataInside['temperature']:
+                    s.sendto(json.dumps(dataInside), (host, port))
+                    print "Set dataInside, " + str(dataInside)
 
                 # Send also into REST API
                 # TODO
