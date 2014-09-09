@@ -5,7 +5,7 @@ import Adafruit_DHT
 import socket
 import json
 import time
-import thread
+import threading
 
 port = 5000
 host = '255.255.255.255'
@@ -59,6 +59,7 @@ def readInside():
 
 
 
-thread.start_new_thread(readFromOutside, ())
-thread.start_new_thread(readInside, ())
-
+t1 = threading.Thread(target=readFromOutside, args=())
+t1.start()
+t2 = threading.Thread(target=readInside, args=())
+t2.start()
