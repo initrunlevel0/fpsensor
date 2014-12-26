@@ -1,11 +1,11 @@
 # Using Adafruit_Python_DHT library to read DHT sensor
 # https://github.com/adafruit/Adafruit_Python_DHT
 
-import sys
 import Adafruit_DHT
 import socket
 import json
 import time
+import thread
 
 port = 5000
 host = '255.255.255.255'
@@ -18,34 +18,47 @@ s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 s.bind((host, port))
 
 dataInside = {}
-while True:
-    # Read from Socket
-    dataOutside = s.recvfrom(1024)
-    dataOutside = json.loads(dataOutside)
-    print "Received dataOutside, " + str(dataOutside)
+def readFromOutside():
+    while True:
+        try:
+            # Read from Socket
+            dataOutside, addr = s.recvfrom(1024)
+            dataOutside = json.loads(dataOutside)
 
-    if dataOutside['source'] != "raspi":
-        # Save to my own data
-        for key in dataOutside:
-            if key != "source":
-                dataInside[key] = dataOutside[key]
+            if dataOutside['source'] != "raspi":
+                print "Received dataOutside, " + str(dataOutside)
 
-    # Read DHT11 on pin 4, HARDCODED
-    humidity, temperature = Adafruit_DHT.read_entry(Adafruit_DHT.DHT_11, 4)
-    if(humidity is not None and temperature is not None):
-        # Create a dictionary data to send to socket
-        dataInside['temperature'] = temperature
-        dataInside['humidity'] = humidity
-        dataInside['source'] = "raspi"
-        print "Set dataInside, " + str(dataInside)
+                # Save to my own data
+                for key in dataOutside:
+                    if key != "source":
+                        dataInside[key] = dataOutside[key]
+        except:
+            pass
 
-        # Send to socket
-        s.sendto(json.dumps(dataInside), (host, port))
+def readInside():
+    while True:
+        try:
+            # Read DHT11 on pin 4, HARDCODED
+            humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
+            if(humidity is not None and temperature is not None):
+                # Create a dictionary data to send to socket
+                dataInside['temperature'] = temperature
+                dataInside['humidity'] = humidity
+                dataInside['source'] = "raspi"
+                print "Set dataInside, " + str(dataInside)
 
-        # Send also into REST API
-        # TODO
+                # Send to socket
+                s.sendto(json.dumps(dataInside), (host, port))
 
-        time.sleep(5)
+                # Send also into REST API
+                # TODO
+
+                time.sleep(5)
+        except:
+            pass
 
 
+
+thread.start_new_thread(readFromOutside, ())
+thread.start_new_thread(readInside, ())
 

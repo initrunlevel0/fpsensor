@@ -14,7 +14,7 @@ s.bind((host, port))
 
 while True:
     # Read from Socket
-    dataOutside = s.recvfrom(1024)
+    dataOutside, addr = s.recvfrom(1024)
     dataOutside = json.loads(dataOutside)
     print "Received dataOutside, " + str(dataOutside)
     time.sleep(5)
