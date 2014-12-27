@@ -58,6 +58,7 @@ def readInside():
 
                 # Send also into REST API
                 # TODO
+                time.sleep(5)
 
         except:
             pass

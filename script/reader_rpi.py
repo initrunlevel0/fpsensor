@@ -8,7 +8,8 @@ import time
 import threading
 
 port = 5000
-host = '255.255.255.255'
+print "Masukkan alamat broadcast"
+host = raw_input()
 
 
 # Define UDP socket
