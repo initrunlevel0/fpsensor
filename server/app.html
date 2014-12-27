@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html class="full" lang="en">
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>The Big Picture - Start Bootstrap Template</title>
+
+    <link href="/static/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/the-big-picture.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+    body {
+        color: white;
+    }
+    .teks {
+        font-size: 1000%;
+    }
+    #debug {
+        font-family: monospace;
+    }
+    </style>
+    <script>
+    setInterval(function() {
+        $.get('/data', function(data) {
+            $("#temperature").html(data.temperature + "&deg;");
+            $("#humidity").html(data.humidity + "%");
+            $("#lightIntensity").html(data.lightIntensity);
+        }, "json")
+    }, 1000);
+    </script>
+
+</head>
+
+<body>
+
+    <!-- Page Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <center>
+                <h3>Teknik Informatika ITS, Surabaya</h3>
+                <h1>Rain</h1>
+                </center>
+            </div>
+            <div class="col-sm-4">
+                <h1 class="teks" id="temperature">?&deg;</h1>
+                Temperature
+            </div>
+            <div class="col-sm-4">
+                <h1 class="teks" id="humidity">?%</h1>
+                Humidity
+            </div>
+            <div class="col-sm-4">
+                <h1 class="teks" id="lightIntensity">?</h1>
+                Light Intensity (lux)
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="/static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
