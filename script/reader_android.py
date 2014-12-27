@@ -1,14 +1,18 @@
 # Using Adafruit_Python_DHT library to read DHT sensor
 # https://github.com/adafruit/Adafruit_Python_DHT
 
-import Adafruit_DHT
 import socket
 import json
 import time
 import threading
+import androidhelper
+
+droid = androidhelper.Android()
 
 port = 5000
-host = '255.255.255.255'
+
+# First, ask about broadcast address
+host = raw_input()
 
 
 # Define UDP socket
@@ -27,7 +31,7 @@ def readFromOutside():
             dataOutside, addr = s.recvfrom(1024)
             dataOutside = json.loads(dataOutside)
 
-            if dataOutside['source'] != "raspi":
+            if dataOutside['source'] != "android":
                 print "Received dataOutside, " + str(dataOutside)
 
                 # Save to my own data
@@ -40,26 +44,21 @@ def readFromOutside():
 def readInside():
     while True:
         try:
-            # Read DHT11 on pin 4, HARDCODED
-            humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
-            if(humidity is not None and temperature is not None):
-                oldTemperature = dataInside['temperature']
-		oldHumidity = dataInside['humidity']
-
+            # Read Android Sensor
+            droid.startSensingTimed(4,250)
+            light = droid.sensorsGetLight().result
+            if(light is not None):
                 # Create a dictionary data to send to socket
-                dataInside['temperature'] = temperature
-                dataInside['humidity'] = humidity
-                dataInside['source'] = "raspi"
+                dataInside['light'] = light
+                dataInside['source'] = "android"
 
                 # Send to socket
-		if oldHumidity != dataInside['humidity'] or oldTemperature != dataInside['temperature']:
-                    s.sendto(json.dumps(dataInside), (host, port))
-                    print "Set dataInside, " + str(dataInside)
+                s.sendto(json.dumps(dataInside), (host, port))
+                print "Set dataInside, " + str(dataInside)
 
                 # Send also into REST API
                 # TODO
 
-                time.sleep(5)
         except:
             pass
 
