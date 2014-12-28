@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var fs = require('fs');
 
 var app = express();
+var fuzzy = require('./fuzzy');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/static', express.static(__dirname + '/static'))
@@ -36,7 +37,11 @@ socket.bind(port, host);
 
 app.get('/data', function(req, res) {
     // TODO: Fuzzy
-    res.send(receivedData);
+    fuzzy(receivedData, function(result) {
+        res.send(result);
+
+    })
+
 });
 
 

@@ -34,6 +34,7 @@
     setInterval(function() {
         $.get('/data', function(data) {
             $("#temperature").html(data.temperature + "&deg;");
+            $("#weather").html(data.weather);
             $("#humidity").html(data.humidity + "%");
             $("#lightIntensity").html(data.lightIntensity);
         }, "json")
@@ -50,7 +51,7 @@
             <div class="col-sm-12">
                 <center>
                 <h3>Teknik Informatika ITS, Surabaya</h3>
-                <h1>Rain</h1>
+                <h1 id="weather">???</h1>
                 </center>
             </div>
             <div class="col-sm-4">
