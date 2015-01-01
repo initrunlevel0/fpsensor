@@ -48,7 +48,7 @@ app.get('/data', function(req, res) {
     // COMMENT ON REAL TEST
     if(!receivedData.temperature) input.temperature = 26.0;
     if(!receivedData.humidity) input.humidity = 60;
-    if(!receivedData.lightIntensity) input.lightIntensity = 5000;
+    if(!receivedData.lightIntensity) input.lightIntensity = 40;
 
     var stdout = "";
     var ps = spawn('python', ['fuzzy.py'], {cwd: '../script'});
@@ -60,7 +60,6 @@ app.get('/data', function(req, res) {
     });
     
     ps.on('close', function() {
-        console.log(stdout);
         try {
             var output = [];
             var weather = JSON.parse(stdout);
@@ -80,7 +79,7 @@ app.get('/data', function(req, res) {
                 output.push(Math.round(weather.cerah*100).toString() + "% Cerah");
             }
 
-            res.send({data: input, weather: output});
+            res.send({data: input, weather: output, fuzz: weather});
         } catch (ex) {
             res.send({data: input})
         }

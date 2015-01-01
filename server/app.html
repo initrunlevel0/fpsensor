@@ -29,25 +29,21 @@
     #debug {
         font-family: monospace;
     }
+    .graph {
+        height: 400px;
+        font-size: 16px;
+        line-height: 1.2em;
+        color: white;
+    }
+
+    .minigraph {
+        height: 200px;
+        font-size: 16px;
+        line-height: 1.2em;
+        color: white;
+    }
+
     </style>
-    <script>
-    setInterval(function() {
-        $.get('/data', function(data) {
-            $("#temperature").html(data.data.temperature + "&deg;");
-            var weather = "";
-            for(idx in data.weather) {
-                if(idx == 0) {
-                    weather += data.weather[idx];
-                } else {
-                    weather += ", " + data.weather[idx];
-                }
-            }
-            $("#weather").html(weather);
-            $("#humidity").html(data.data.humidity + "%");
-            $("#lightIntensity").html(data.data.lightIntensity);
-        }, "json")
-    }, 1000);
-    </script>
 
 </head>
 
@@ -75,10 +71,150 @@
                 Light Intensity (lux)
             </div>
         </div>
+        <br/>
+        <h2>The Debug - Input Range</h2>
+        <div class="row">
+            <div class="col-sm-4 graph" id="temperatureGraph">
+            </div>
+            <div class="col-sm-4 graph" id="humidityGraph">
+            </div>
+            <div class="col-sm-4 graph" id="lightIntensityGraph">
+            </div>
+        </div>
+        <h2>The Rule and Result</h2>
+        <h3>
+        <p>0 = Low, 1 = Medium, 2 = High</p>
+        <div class="row">
+            <div class="col-sm-12">
+                <table class="table" id="tableRule">
+                    <tr>
+                        <td><strong>Temperature</strong></td>
+                        <td><strong>Humidity</strong></td>
+                        <td><strong>Light Intensity</strong></td>
+                        <td><strong>Point</strong></td>
+                        <td><strong>Verdict</strong></td>
+                        <td><strong>MinGraph</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        </h3>
+        <h2>The Debug - Agregate and Result</h2>
+        <div class="row">
+            <div class="col-sm-6 graph" id="agregate">
+            </div>
+            <div class="col-sm-6 graph" id="resultGraph">
+            </div>
+        </div>
+
     </div>
 
     <script src="/static/bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="/static/bower_components/flot/jquery.flot.js"></script>
     <script src="/static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script>
+    $(document).ready(function() {
+    //setInterval(function() {
+        $.get('/data', function(data) {
+            $("#temperature").html(data.data.temperature + "&deg;");
+            var weather = "";
+            for(idx in data.weather) {
+                if(idx == 0) {
+                    weather += data.weather[idx];
+                } else {
+                    weather += ", " + data.weather[idx];
+                }
+            }
+            $("#weather").html(weather);
+            $("#humidity").html(data.data.humidity + "%");
+            $("#lightIntensity").html(data.data.lightIntensity);
+
+            // Graph preparation
+            // Suhu
+            var suhu_rendah = [];
+            var suhu_sedang = [];
+            var suhu_tinggi = [];
+            for(i in data.fuzz.debug.suhu) {
+                suhu_rendah.push([data.fuzz.debug.suhu[i], data.fuzz.debug.suhu_rendah[i]])
+                suhu_sedang.push([data.fuzz.debug.suhu[i], data.fuzz.debug.suhu_sedang[i]])
+                suhu_tinggi.push([data.fuzz.debug.suhu[i], data.fuzz.debug.suhu_tinggi[i]])
+            }
+            var poin_suhu = [[data.data.temperature, 0], [data.data.temperature, 1]];
+            $.plot("#temperatureGraph", [suhu_rendah, suhu_sedang, suhu_tinggi, poin_suhu]);
+
+            // Cahaya
+            var cahaya_gelap = [];
+            var cahaya_sedang = [];
+            var cahaya_terang = [];
+
+            for(i in data.fuzz.debug.cahaya) {
+                cahaya_gelap.push([data.fuzz.debug.cahaya[i], data.fuzz.debug.cahaya_gelap[i]])
+                cahaya_sedang.push([data.fuzz.debug.cahaya[i], data.fuzz.debug.cahaya_sedang[i]])
+                cahaya_terang.push([data.fuzz.debug.cahaya[i], data.fuzz.debug.cahaya_terang[i]])
+            }
+
+            var poin_cahaya = [[data.data.lightIntensity, 0], [data.data.lightIntensity, 1]];
+            $.plot("#lightIntensityGraph", [cahaya_gelap, cahaya_sedang, cahaya_terang, poin_cahaya]);
+
+            // kelembapan
+            var kelembapan_rendah = [];
+            var kelembapan_sedang = [];
+            var kelembapan_tinggi = [];
+            for(i in data.fuzz.debug.kelembapan) {
+                kelembapan_rendah.push([data.fuzz.debug.kelembapan[i], data.fuzz.debug.kelembapan_rendah[i]])
+                kelembapan_sedang.push([data.fuzz.debug.kelembapan[i], data.fuzz.debug.kelembapan_sedang[i]])
+                kelembapan_tinggi.push([data.fuzz.debug.kelembapan[i], data.fuzz.debug.kelembapan_tinggi[i]])
+            }
+            var poin_kelembapan = [[data.data.humidity, 0], [data.data.humidity, 1]];
+            $.plot("#humidityGraph", [kelembapan_rendah, kelembapan_sedang, kelembapan_tinggi, poin_kelembapan]);
+
+            // result
+            var cuaca_hujan = [];
+            var cuaca_sejuk = [];
+            var cuaca_berawan = [];
+            var cuaca_cerah = [];
+            for(i in data.fuzz.debug.cuaca) {
+                cuaca_hujan.push([data.fuzz.debug.cuaca[i], data.fuzz.debug.cuaca_hujan[i]]);
+                cuaca_sejuk.push([data.fuzz.debug.cuaca[i], data.fuzz.debug.cuaca_sejuk[i]]);
+                cuaca_berawan.push([data.fuzz.debug.cuaca[i], data.fuzz.debug.cuaca_berawan[i]]);
+                cuaca_cerah.push([data.fuzz.debug.cuaca[i], data.fuzz.debug.cuaca_cerah[i]]);
+            }
+
+            var centroid = [[data.fuzz.debug.centroid, 0], [data.fuzz.debug.centroid, 1]];
+            $.plot("#resultGraph", [cuaca_hujan, cuaca_sejuk, cuaca_berawan, cuaca_cerah, centroid]);
+
+            // Rule table
+            for(i in data.fuzz.debug.rule_text) {
+                var it = data.fuzz.debug.rule_text[i];
+                var ver = data.fuzz.debug.imp_text[i];
+                var pt = data.fuzz.debug.rule[i];
+
+                $("#tableRule tr:last").after("<tr><td>" + it[0] + "</td><td>" + it[1] + "</td><td>" + it[2] + "</td><td>" + pt + "</td><td>" + ver + "</td><td><div class='minigraph' id='imp" + i + "'></div></td></tr>");
+                var gr = [];
+                for(j in data.fuzz.debug.cuaca) {
+                    gr.push([data.fuzz.debug.cuaca[j], data.fuzz.debug.imp[i][j] ]);
+                }
+
+                $.plot("#imp" + i, [gr]);
+
+
+
+            }
+
+            // Agregate
+            var agre = [];
+            for(i in data.fuzz.debug.cuaca) {
+                agre.push([data.fuzz.debug.cuaca[i], data.fuzz.debug.agregate_membership[i]])
+            }
+
+
+            $.plot("#agregate", [agre]);
+                
+
+        }, "json")
+    //}, 1000);
+    });
+    </script>
 
 </body>
 
