@@ -33,10 +33,18 @@
     <script>
     setInterval(function() {
         $.get('/data', function(data) {
-            $("#temperature").html(data.temperature + "&deg;");
-            $("#weather").html(data.weather);
-            $("#humidity").html(data.humidity + "%");
-            $("#lightIntensity").html(data.lightIntensity);
+            $("#temperature").html(data.data.temperature + "&deg;");
+            var weather = "";
+            for(idx in data.weather) {
+                if(idx == 0) {
+                    weather += data.weather[idx];
+                } else {
+                    weather += ", " + data.weather[idx];
+                }
+            }
+            $("#weather").html(weather);
+            $("#humidity").html(data.data.humidity + "%");
+            $("#lightIntensity").html(data.data.lightIntensity);
         }, "json")
     }, 1000);
     </script>

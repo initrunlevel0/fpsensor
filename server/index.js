@@ -1,9 +1,9 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var fs = require('fs');
+var spawn = require('child_process').spawn;
 
 var app = express();
-var fuzzy = require('./fuzzy');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/static', express.static(__dirname + '/static'))
@@ -22,6 +22,7 @@ var dgram = require('dgram');
 var port = 5000;
 var host = "192.168.43.255";    // Receive and send from/to everything
 var socket = dgram.createSocket('udp4');
+
 var receivedData = {};
 
 socket.on('message', function(message, remote) {
@@ -36,11 +37,54 @@ socket.on('message', function(message, remote) {
 socket.bind(port, host);
 
 app.get('/data', function(req, res) {
-    // TODO: Fuzzy
-    fuzzy(receivedData, function(result) {
-        res.send(result);
+    var input = {};
 
-    })
+    input.temperature = receivedData.temperature;
+    input.humidity = receivedData.humidity;
+    input.lightIntensity = receivedData.lightIntensity;
+    input.hours = (new Date).getHours()
+
+    // Default received data
+    // COMMENT ON REAL TEST
+    if(!receivedData.temperature) input.temperature = 26.0;
+    if(!receivedData.humidity) input.humidity = 60;
+    if(!receivedData.lightIntensity) input.lightIntensity = 5000;
+
+    var stdout = "";
+    var ps = spawn('python', ['fuzzy.py'], {cwd: '../script'});
+    ps.stdin.end(JSON.stringify(input))
+    ps.stderr.pipe(process.stdout);
+
+    ps.stdout.on('data', function(data) {
+        stdout += data.toString();
+    });
+    
+    ps.on('close', function() {
+        console.log(stdout);
+        try {
+            var output = [];
+            var weather = JSON.parse(stdout);
+            if(weather.hujan > 0) {
+                output.push(Math.round(weather.hujan*100).toString() + "% Hujan");
+            }
+
+            if(weather.sejuk > 0) {
+                output.push(Math.round(weather.sejuk*100).toString() + "% Sejuk");
+            }
+
+            if(weather.berawan > 0) {
+                output.push(Math.round(weather.berawan*100).toString() + "% Berawan");
+            }
+
+            if(weather.cerah > 0) {
+                output.push(Math.round(weather.cerah*100).toString() + "% Cerah");
+            }
+
+            res.send({data: input, weather: output});
+        } catch (ex) {
+            res.send({data: input})
+        }
+    });
 
 });
 
