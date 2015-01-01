@@ -21,7 +21,7 @@ radianPerJam = math.pi / 24
 
 # Buat input
 suhu = np.arange(15, 38, 1)
-cahaya = np.arange(10, 100, 10)
+cahaya = np.arange(0, 100, 10)
 kelembapan = np.arange(0, 100, 10)
 
 poin_hasil['debug']['suhu'] = suhu.tolist()
@@ -32,9 +32,10 @@ poin_hasil['debug']['kelembapan'] = kelembapan.tolist()
 pengali = math.sin(radianPerJam * jam) 
 
 # Range suhu
-suhu_rendah = fuzz.trapmf(suhu, [20+8*pengali, 20+8*pengali, 22+8*pengali, 24+8*pengali])
+suhu_rendah = fuzz.trapmf(suhu, [0, 0, 22+8*pengali, 24+8*pengali])
 suhu_sedang = fuzz.trimf(suhu, [22+8*pengali, 24+8*pengali, 26+8*pengali])
-suhu_tinggi = fuzz.trapmf(suhu, [24+8*pengali, 26+8*pengali, 28+8*pengali, 28+8*pengali])
+suhu_tinggi = fuzz.trapmf(suhu, [24+8*pengali, 26+8*pengali, 40, 40])
+
 
 poin_hasil['debug']['suhu_rendah'] = suhu_rendah.tolist()
 poin_hasil['debug']['suhu_sedang'] = suhu_sedang.tolist()
@@ -43,16 +44,16 @@ poin_hasil['debug']['suhu_tinggi'] = suhu_tinggi.tolist()
 # Range cahaya
 cahaya_gelap = fuzz.trapmf(cahaya, [2*pengali, 2*pengali, 10+2*pengali, 20+2*pengali])
 cahaya_sedang = fuzz.trimf(cahaya, [20+2*pengali, 30+2*pengali, 40+2*pengali])
-cahaya_terang = fuzz.trapmf(cahaya, [20*pengali, 30*pengali, 40+2*pengali, 40+2*pengali])
+cahaya_terang = fuzz.trapmf(cahaya, [30+2*pengali, 40+2*pengali, 50+2*pengali, 50+2*pengali])
 
 poin_hasil['debug']['cahaya_gelap'] = cahaya_gelap.tolist()
 poin_hasil['debug']['cahaya_sedang'] = cahaya_sedang.tolist()
 poin_hasil['debug']['cahaya_terang'] = cahaya_terang.tolist()
 
 # Range Kelembapan (Tetap)
-kelembapan_rendah = fuzz.trapmf(kelembapan, [30, 30, 40, 50])
+kelembapan_rendah = fuzz.trapmf(kelembapan, [0, 0, 40, 50])
 kelembapan_sedang = fuzz.trimf(kelembapan, [40, 50, 60])
-kelembapan_tinggi = fuzz.trapmf(kelembapan, [60, 70, 100, 100])
+kelembapan_tinggi = fuzz.trapmf(kelembapan, [50, 60, 100, 100])
 
 poin_hasil['debug']['kelembapan_rendah'] = kelembapan_rendah.tolist()
 poin_hasil['debug']['kelembapan_sedang'] = kelembapan_sedang.tolist()
@@ -63,8 +64,8 @@ cuaca = np.arange(0, 100, 10)
 poin_hasil['debug']['cuaca'] = cuaca.tolist()
 
 cuaca_hujan = fuzz.trapmf(cuaca, [0, 0, 30, 50])
-cuaca_sejuk = fuzz.trapmf(cuaca, [30, 40, 50, 60])
-cuaca_berawan = fuzz.trapmf(cuaca, [40, 50, 60, 70])
+cuaca_berawan = fuzz.trapmf(cuaca, [30, 40, 50, 60])
+cuaca_sejuk = fuzz.trapmf(cuaca, [40, 50, 60, 70])
 cuaca_cerah = fuzz.trapmf(cuaca, [70, 80, 100, 100])
 
 poin_hasil['debug']['cuaca_hujan'] = cuaca_hujan.tolist()

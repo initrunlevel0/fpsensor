@@ -33,14 +33,14 @@
         height: 400px;
         font-size: 16px;
         line-height: 1.2em;
-        color: white;
+        color: black;
     }
 
     .minigraph {
         height: 200px;
         font-size: 16px;
         line-height: 1.2em;
-        color: white;
+        color: black;
     }
 
     </style>
@@ -185,11 +185,16 @@
 
             // Rule table
             for(i in data.fuzz.debug.rule_text) {
+                var txt = ["low", "med", "high"];
                 var it = data.fuzz.debug.rule_text[i];
                 var ver = data.fuzz.debug.imp_text[i];
                 var pt = data.fuzz.debug.rule[i];
 
-                $("#tableRule tr:last").after("<tr><td>" + it[0] + "</td><td>" + it[1] + "</td><td>" + it[2] + "</td><td>" + pt + "</td><td>" + ver + "</td><td><div class='minigraph' id='imp" + i + "'></div></td></tr>");
+                var poin_cahaya = data.fuzz.debug.poin_cahaya;
+                var poin_suhu = data.fuzz.debug.poin_suhu;
+                var poin_kelembapan = data.fuzz.debug.poin_kelembapan;
+
+                $("#tableRule tr:last").after("<tr><td>" + txt[it[0]] + "<br/>" + poin_suhu[it[0]]+ "</td><td>" + txt[it[1]] + "<br/>" + poin_kelembapan[it[1]] + "</td><td>" + txt[it[2]] + "<br/>" + poin_cahaya[it[2]] + "</td><td>" + pt + "</td><td>" + ver + "</td><td><div class='minigraph' id='imp" + i + "'></div></td></tr>");
                 var gr = [];
                 for(j in data.fuzz.debug.cuaca) {
                     gr.push([data.fuzz.debug.cuaca[j], data.fuzz.debug.imp[i][j] ]);
