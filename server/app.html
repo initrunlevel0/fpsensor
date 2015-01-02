@@ -88,9 +88,9 @@
             <div class="col-sm-12">
                 <table class="table" id="tableRule">
                     <tr>
-                        <td><strong>Temperature</strong></td>
-                        <td><strong>Humidity</strong></td>
-                        <td><strong>Light Intensity</strong></td>
+                        <td><strong>Temp</strong></td>
+                        <td><strong>Humid</strong></td>
+                        <td><strong>Light</strong></td>
                         <td><strong>Point</strong></td>
                         <td><strong>Verdict</strong></td>
                         <td><strong>MinGraph</strong></td>
@@ -194,13 +194,21 @@
                 var poin_suhu = data.fuzz.debug.poin_suhu;
                 var poin_kelembapan = data.fuzz.debug.poin_kelembapan;
 
-                $("#tableRule tr:last").after("<tr><td>" + txt[it[0]] + "<br/>" + poin_suhu[it[0]]+ "</td><td>" + txt[it[1]] + "<br/>" + poin_kelembapan[it[1]] + "</td><td>" + txt[it[2]] + "<br/>" + poin_cahaya[it[2]] + "</td><td>" + pt + "</td><td>" + ver + "</td><td><div class='minigraph' id='imp" + i + "'></div></td></tr>");
+                $("#tableRule tr:last").after("<tr><td>" + txt[it[0]] + "<br/>" + poin_suhu[it[0]].toFixed(2) + "</td><td>" + txt[it[1]] + "<br/>" + poin_kelembapan[it[1]].toFixed(2) + "</td><td>" + txt[it[2]] + "<br/>" + poin_cahaya[it[2]].toFixed(2) + "</td><td>" + pt.toFixed(2) + "</td><td>" + ver + "</td><td><div class='minigraph' id='imp" + i + "'></div></td></tr>");
+
+                var cc = []
+                for(j in data.fuzz.debug.cuaca) {
+                    cc.push([data.fuzz.debug.cuaca[j], data.fuzz.debug['cuaca_' + ver][j]]);
+                }
+
                 var gr = [];
                 for(j in data.fuzz.debug.cuaca) {
                     gr.push([data.fuzz.debug.cuaca[j], data.fuzz.debug.imp[i][j] ]);
                 }
 
-                $.plot("#imp" + i, [gr]);
+                var cut = [[0, pt], [100, pt]];
+
+                $.plot("#imp" + i, [cc, cut, {data: gr, lines: {fill: true}}]);
 
 
 
@@ -208,12 +216,23 @@
 
             // Agregate
             var agre = [];
+            var agreGraph = [];
             for(i in data.fuzz.debug.cuaca) {
                 agre.push([data.fuzz.debug.cuaca[i], data.fuzz.debug.agregate_membership[i]])
             }
+            
+            agreGraph.push({data: agre, lines: {fill: true}});
 
+            for(i in data.fuzz.debug.imp) {
+                var gr = [];
+                for(j in data.fuzz.debug.cuaca) {
+                    gr.push([data.fuzz.debug.cuaca[j], data.fuzz.debug.imp[i][j]]);
+                }
+                agreGraph.push({data: gr})
 
-            $.plot("#agregate", [agre]);
+            }
+
+            $.plot("#agregate", agreGraph);
                 
 
         }, "json")
