@@ -29,7 +29,7 @@ poin_hasil['debug']['cahaya'] = cahaya.tolist()
 poin_hasil['debug']['kelembapan'] = kelembapan.tolist()
 
 # Buat range untuk kategori
-pengali = math.sin(radianPerJam * jam) 
+pengali = math.sin(radianPerJam * jam)
 
 # Range suhu
 suhu_rendah = fuzz.trapmf(suhu, [0, 0, 22+8*pengali, 24+8*pengali])

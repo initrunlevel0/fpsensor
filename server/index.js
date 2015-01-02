@@ -43,12 +43,13 @@ app.get('/data', function(req, res) {
     input.humidity = receivedData.humidity;
     input.lightIntensity = receivedData.lightIntensity;
     input.hours = (new Date).getHours()
+    input.source = receivedData.source;
 
     // Default received data
     // COMMENT ON REAL TEST
-    if(!receivedData.temperature) input.temperature = 26.0;
-    if(!receivedData.humidity) input.humidity = 60;
-    if(!receivedData.lightIntensity) input.lightIntensity = 40;
+    if(!receivedData.temperature) input.temperature = 25.0;
+    if(!receivedData.humidity) input.humidity = 70;
+    if(!receivedData.lightIntensity) input.lightIntensity = 30;
 
     var stdout = "";
     var ps = spawn('python', ['fuzzy.py'], {cwd: '../script'});
@@ -58,7 +59,7 @@ app.get('/data', function(req, res) {
     ps.stdout.on('data', function(data) {
         stdout += data.toString();
     });
-    
+
     ps.on('close', function() {
         try {
             var output = [];

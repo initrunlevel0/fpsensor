@@ -56,6 +56,7 @@
                 <center>
                 <h3>Teknik Informatika ITS, Surabaya</h3>
                 <h1 id="weather">???</h1>
+                <h4>Data Source: <span id="source"></span></h4>
                 </center>
             </div>
             <div class="col-sm-4">
@@ -117,6 +118,7 @@
     //setInterval(function() {
         $.get('/data', function(data) {
             $("#temperature").html(data.data.temperature + "&deg;");
+            $("#source").html(data.data.source);
             var weather = "";
             for(idx in data.weather) {
                 if(idx == 0) {
